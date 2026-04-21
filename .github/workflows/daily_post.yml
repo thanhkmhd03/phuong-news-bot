@@ -1,0 +1,43 @@
+name: Auto News Post - Phường Kinh Môn
+
+on:
+  schedule:
+    # 2h sáng UTC tương ứng với 9h sáng giờ Việt Nam (GMT+7)
+    - cron: '0 2 * * *'
+  workflow_dispatch: # Tạo nút bấm "Run" để bạn đăng thủ công bất cứ lúc nào
+
+jobs:
+  run-bot:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write # Quyền cực kỳ quan trọng để bot ghi lại history.json
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Install Playwright Browsers
+        run: npx playwright install chromium --with-deps
+
+      - name: Run Bot
+        env:
+          GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
+          FB_PAGE_ID: ${{ secrets.FB_PAGE_ID }}
+          FB_ACCESS_TOKEN: ${{ secrets.FB_ACCESS_TOKEN }}
+        run: node index.js
+
+      - name: Commit & Push history.json
+        run: |
+          git config --global user.name "GitHub Actions Bot"
+          git config --global user.email "actions@github.com"
+          git add history.json
+          git commit -m "Update history: $(date)" || echo "No changes to commit"
+          git push
