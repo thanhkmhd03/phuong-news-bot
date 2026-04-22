@@ -31,7 +31,7 @@ const parser = new Parser({
 });
 
 // Nguồn RSS duy nhất từ Google News (Đã lọc các trang chính thống)
-const rssSource = encodeURI('https://news.google.com/rss/search?q=Hải Phòng site:baochinhphu.vn OR site:baohaiphong.com.vn OR site:dangcongsan.vn OR site:nhandan.vn&hl=vi&gl=VN&ceid=VN:vi');
+const rssSource = encodeURI('https://news.google.com/rss/search?q=Hải Phòng site:baochinhphu.vn OR site:baohaiphong.vn OR site:dangcongsan.vn OR site:nhandan.vn&hl=vi&gl=VN&ceid=VN:vi');
 
 const HISTORY_FILE = 'history.json';
 
@@ -248,7 +248,7 @@ CẤU TRÚC BÀI ĐĂNG (Cấm dùng nhãn):
 
 [DÒNG 2]: Một đoạn dẫn dắt ngắn gọn về bối cảnh sự kiện.
 
-[DÒNG 3]: Các gạch đầu dòng. Mỗi gạch đầu dòng phải là một chỉ đạo/sự kiện KHÁC NHAU từ bài báo. (Ví dụ: 🔹 Trình dự án Luật người lao động...; 🔹 Phân công chủ trì soạn thảo các dự án Luật năm 2026...).
+[DÒNG 3]: Các gạch đầu dòng. Mỗi gạch đầu dòng phải là một chỉ đạo/sự kiện KHÁC NHAU từ bài báo. (Ví dụ: - Trình dự án Luật người lao động...; - Phân công chủ trì soạn thảo các dự án Luật năm 2026...).
 
 [DÒNG 4]: Câu kết định hướng thực tế.
 
