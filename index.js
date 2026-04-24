@@ -87,7 +87,7 @@ async function scrapeImages(url, sourceName = 'Không rõ') {
         const page = await context.newPage();
 
         // Mở trang web
-        await page.goto(url, { waitUntil: 'networkidle', timeout: 30000 });
+        await page.goto(url, { waitUntil: 'domcontentloaded', timeout: 30000 });
         console.log(">> URL hiện tại sau chuyển hướng: ", page.url());
 
         // [VÁ LỖI 3] - ÉP BOT CUỘN CHUỘT ĐỂ HIỆN ẢNH LAZY-LOAD
@@ -104,10 +104,10 @@ async function scrapeImages(url, sourceName = 'Không rõ') {
 
         // [VÁ LỖI 2] - BỔ SUNG CÁC CLASS CỦA BÁO HẢI PHÒNG VÀ CÁC BÁO KHÁC
         const wrapperSelectors = [
-            '.detail-content', '.fck_detail', '.chi-tiet', '.post-content',
+            '.b-maincontent', '.detail-content', '.fck_detail', '.chi-tiet', '.post-content',
             '.article-body', '.entry-content', 'article',
             '.article-detail', '.noidung', '.content-detail', '.box-content',
-            '.c-news-detail', '.b-maincontent', '.body-content', '.news-body',
+            '.c-news-detail', '.body-content', '.news-body',
             '#news-body', '.content-wrap', '.post-detail'
         ];
         let mainContent = null;

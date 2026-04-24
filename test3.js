@@ -11,43 +11,22 @@ async function testScrape(url) {
         const page = await context.newPage();
 
         await page.goto(url, { waitUntil: 'networkidle', timeout: 30000 });
-
-        await page.evaluate(() => {
-            window.scrollBy(0, 800);
-        });
+        await page.evaluate(() => { window.scrollBy(0, 800); });
         await page.waitForTimeout(1500);
 
         const html = await page.content();
         const $ = cheerio.load(html);
-        const images = [];
         
-        const wrapperSelectors = [
-            '.detail-content', '.fck_detail', '.chi-tiet', '.post-content',
-            '.article-body', '.entry-content', 'article',
-            '.article-detail', '.noidung', '.content-detail', '.box-content',
-            '.c-news-detail', '.b-maincontent' // NEW
-        ];
-        
-        let mainContent = null;
-        for (const sel of wrapperSelectors) {
-            if ($(sel).length > 0) {
-                console.log(`Found content matching selector: ${sel}`);
-                mainContent = $(sel).first();
-                break;
-            }
-        }
+        const mainContent = $('.c-news-detail').first();
 
-        if (!mainContent) {
-            console.log("No main content found.");
-            return;
-        }
-
-        const allImgs = [];
         mainContent.find('img').each((i, el) => {
-            allImgs.push($(el));
+            console.log(`\n--- IMG ${i} ---`);
+            console.log('src:', $(el).attr('src'));
+            console.log('data-src:', $(el).attr('data-src'));
+            console.log('width:', $(el).attr('width'));
+            console.log('height:', $(el).attr('height'));
+            console.log('class:', $(el).attr('class'));
         });
-        
-        console.log(`Found ${allImgs.length} raw img tags.`);
         
     } catch (error) {
         console.error(error);
