@@ -76,7 +76,7 @@ function extractImage(item) {
     return null;
 }
 
-// Hàm thu thập ảnh trực tiếp từ bài báo (Web Scraping)
+/// Hàm thu thập ảnh trực tiếp từ bài báo (Web Scraping)
 async function scrapeImages(url, sourceName = 'Không rõ') {
     let browser = null;
     try {
@@ -86,18 +86,28 @@ async function scrapeImages(url, sourceName = 'Không rõ') {
         });
         const page = await context.newPage();
 
-        // Mở trang web và đợi mạng rảnh rỗi để vượt qua redirect
+        // Mở trang web
         await page.goto(url, { waitUntil: 'networkidle', timeout: 30000 });
-
         console.log(">> URL hiện tại sau chuyển hướng: ", page.url());
+
+        // [VÁ LỖI 3] - ÉP BOT CUỘN CHUỘT ĐỂ HIỆN ẢNH LAZY-LOAD
+        await page.evaluate(() => {
+            // Cuộn từ từ xuống khoảng giữa trang để kích hoạt toàn bộ ảnh
+            window.scrollBy(0, 800);
+        });
+        await page.waitForTimeout(1500); // Đợi 1.5 giây cho ảnh kịp tải về
 
         const html = await page.content();
         const $ = cheerio.load(html);
         const images = [];
         const seenUrls = new Set();
 
-        // 1. Chỉ quét ảnh TRONG các thẻ bao bọc nội dung
-        const wrapperSelectors = ['.detail-content', '.fck_detail', '.chi-tiet', '.post-content', '.article-body', '.entry-content', 'article'];
+        // [VÁ LỖI 2] - BỔ SUNG CÁC CLASS CỦA BÁO HẢI PHÒNG VÀ CÁC BÁO KHÁC
+        const wrapperSelectors = [
+            '.detail-content', '.fck_detail', '.chi-tiet', '.post-content',
+            '.article-body', '.entry-content', 'article',
+            '.article-detail', '.noidung', '.content-detail', '.box-content'
+        ];
         let mainContent = null;
 
         for (const sel of wrapperSelectors) {
@@ -112,17 +122,15 @@ async function scrapeImages(url, sourceName = 'Không rõ') {
             return [];
         }
 
-        // Lấy tất cả thẻ img trong vùng nội dung chính
         const allImgs = [];
         mainContent.find('img').each((i, el) => {
             allImgs.push($(el));
         });
 
-        // 2. Ưu tiên ảnh có chú thích (nằm trong thẻ figure)
         allImgs.sort((a, b) => {
             const aIsFigure = a.closest('figure').length > 0 ? 1 : 0;
             const bIsFigure = b.closest('figure').length > 0 ? 1 : 0;
-            return bIsFigure - aIsFigure; // Ưu tiên 1 trước 0 sau
+            return bIsFigure - aIsFigure;
         });
 
         for (const el of allImgs) {
@@ -136,26 +144,26 @@ async function scrapeImages(url, sourceName = 'Không rõ') {
 
             const srcLower = src.toLowerCase();
 
-            // Lọc định dạng chuẩn
-            if (!srcLower.includes('.jpg') && !srcLower.includes('.jpeg') && !srcLower.includes('.png')) continue;
+            // [VÁ LỖI 1] - BỔ SUNG ĐUÔI .WEBP VÀ LINK KHÔNG CÓ ĐUÔI (DẠNG API MẢNG)
+            // Nếu link có chứa các từ khóa định dạng, hoặc là link base64/api không rõ đuôi nhưng hợp lệ
+            const hasValidExtension = srcLower.includes('.jpg') || srcLower.includes('.jpeg') || srcLower.includes('.png') || srcLower.includes('.webp');
 
-            // Loại bỏ các keyword rác
-            const garbageKeywords = ['icon', 'logo', 'avatar', 'ads', 'bookmark', 'share', 'base64'];
+            // Một số báo giấu đuôi ảnh, nếu nó không chứa đuôi hợp lệ mà cũng không phải file HTML/PHP thì tạm chấp nhận
+            if (!hasValidExtension && (srcLower.includes('.html') || srcLower.includes('.php'))) continue;
+
+            const garbageKeywords = ['icon', 'logo', 'avatar', 'ads', 'bookmark', 'share', 'base64', 'svg'];
             if (garbageKeywords.some(kw => srcLower.includes(kw))) continue;
 
             if (seenUrls.has(src)) continue;
 
-            // Kiểm tra kích thước và tỉ lệ khung hình (nếu báo có gán sẵn thuộc tính)
             const width = parseInt(el.attr('width'));
             const height = parseInt(el.attr('height'));
 
-            // Loại bỏ ảnh quá nhỏ
             if (!isNaN(width) && width < 200) continue;
             if (!isNaN(height) && height < 200) continue;
 
             if (!isNaN(width) && !isNaN(height) && height > 0) {
                 const ratio = width / height;
-                // Loại bỏ ảnh dị dạng (quá dài hoặc quá hẹp làm vỡ layout Album)
                 if (ratio < 0.5 || ratio > 2.5) continue;
             }
 
