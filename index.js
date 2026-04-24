@@ -106,7 +106,9 @@ async function scrapeImages(url, sourceName = 'Không rõ') {
         const wrapperSelectors = [
             '.detail-content', '.fck_detail', '.chi-tiet', '.post-content',
             '.article-body', '.entry-content', 'article',
-            '.article-detail', '.noidung', '.content-detail', '.box-content'
+            '.article-detail', '.noidung', '.content-detail', '.box-content',
+            '.c-news-detail', '.b-maincontent', '.body-content', '.news-body',
+            '#news-body', '.content-wrap', '.post-detail'
         ];
         let mainContent = null;
 
