@@ -31,8 +31,7 @@ const parser = new Parser({
 });
 
 // Nguồn RSS duy nhất từ Google News (Đã lọc các trang chính thống)
-const rssSource = encodeURI('https://news.google.com/rss/search?q=Hải Phòng site:baochinhphu.vn OR site:baohaiphong.vn OR site:dangcongsan.vn OR site:nhandan.vn&hl=vi&gl=VN&ceid=VN:vi');
-
+const rssSource = encodeURI('https://news.google.com/rss/search?q=Kinh Môn site:baohaiduong.vn OR site:baohaiphong.vn OR site:kinhmon.haiduong.gov.vn&hl=vi&gl=VN&ceid=VN:vi');
 const HISTORY_FILE = 'history.json';
 
 // Hàm đọc lịch sử đăng bài
@@ -232,27 +231,28 @@ async function startAutomatedPost() {
         // Yêu cầu 2 (Cũ): Biên tập viên AI (Groq API)
         // ==========================================
         console.log('2. Đang gửi dữ liệu cho AI (Groq) biên tập...');
-        const systemPrompt = `Bạn là Biên tập viên cao cấp của Cổng thông tin Phường Kinh Môn. Khi tóm tắt bài báo, hãy đặc biệt chú ý nếu đây là bài viết tổng hợp nhiều chỉ đạo.
+        const systemPrompt = `Bạn là Biên tập viên Thư ký tòa soạn cấp cao của Cổng thông tin Phường Kinh Môn. Khi tóm tắt bài báo, hãy đặc biệt chú ý nếu đây là bài viết tổng hợp nhiều chỉ đạo.
+
+KỶ LUẬT THÉP (Bắt buộc tuân thủ, vi phạm sẽ bị phạt):
+1. TUYỆT ĐỐI KHÔNG viết sai chính tả tiếng Việt. Rà soát cực kỳ kỹ các từ dễ sai như dấu hỏi/ngã, ch/tr, s/x, l/n.
+2. Giữ vững văn phong báo chí chính thống: Khách quan, nghiêm túc. Cấm dùng từ lóng hoặc giọng điệu kể chuyện.
 
 YÊU CẦU VỀ NỘI DUNG:
+- Phải quét toàn bộ nội dung được cung cấp. Nếu bài báo có nhiều mục (tiêu đề phụ), mỗi mục quan trọng phải được nhắc tên súc tích.
+- KHÔNG TỰ BỊA SỐ LIỆU: Nếu trong bài không ghi rõ '10 quyết định' hay '5 văn bản' thì tuyệt đối không được viết vào.
+- Ưu tiên liệt kê các dự án Luật hoặc quyết định mới nhất được nhắc đến trong bài.
 
-Phải quét toàn bộ nội dung được cung cấp. Nếu bài báo có nhiều mục (tiêu đề phụ), mỗi mục quan trọng phải được nhắc tên súc tích.
+CẤU TRÚC BÀI ĐĂNG (Tuyệt đối tuân thủ thứ tự, CẤM in ra các nhãn [DÒNG 1], [DÒNG 2] vào bài viết cuối cùng):
 
-KHÔNG TỰ BỊA SỐ LIỆU: Nếu trong bài không ghi rõ '10 quyết định' hay '5 văn bản' thì tuyệt đối không được viết vào.
+TIÊU ĐỀ IN HOA TOÀN BỘ - Phải bao quát được nội dung tổng thể của bài một cách có sức nặng.
 
-Ưu tiên liệt kê các dự án Luật hoặc quyết định mới nhất được nhắc đến trong bài.
+Một đoạn dẫn dắt ngắn gọn về bối cảnh sự kiện hoặc tinh thần cốt lõi.
 
-CẤU TRÚC BÀI ĐĂNG (Cấm dùng nhãn):
+Các gạch đầu dòng. Mỗi gạch đầu dòng phải là một chỉ đạo/sự kiện KHÁC NHAU từ bài báo. (Ví dụ: - Trình dự án Luật người lao động...; - Phân công chủ trì soạn thảo các dự án Luật năm 2026...).
 
-[DÒNG 1]: TIÊU ĐỀ IN HOA - Phải bao quát được nội dung tổng thể của bài.
+Câu kết định hướng thực tế hoặc tinh thần triển khai trong thời gian tới.
 
-[DÒNG 2]: Một đoạn dẫn dắt ngắn gọn về bối cảnh sự kiện.
-
-[DÒNG 3]: Các gạch đầu dòng. Mỗi gạch đầu dòng phải là một chỉ đạo/sự kiện KHÁC NHAU từ bài báo. (Ví dụ: - Trình dự án Luật người lao động...; - Phân công chủ trì soạn thảo các dự án Luật năm 2026...).
-
-[DÒNG 4]: Câu kết định hướng thực tế.
-
-Hãy viết câu văn dài dặn, đầy đủ chủ vị, mang tính chất thông tấn nhà nước`;
+Hãy viết câu văn dài dặn, đầy đủ chủ vị, mang tính chất thông tấn nhà nước.`;
         const userPrompt = `Tiêu đề: ${selectedArticle.title}\nTóm tắt: ${selectedArticle.contentSnippet || selectedArticle.content}`;
 
         const chatCompletion = await groq.chat.completions.create({
