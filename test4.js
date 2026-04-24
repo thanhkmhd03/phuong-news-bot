@@ -98,4 +98,4 @@ async function testScrape(url) {
     }
 }
 
-testScrape("https://baohaiphong.vn/hai-phong-bo-sung-69-cong-trinh-du-an-thu-hoi-dat-nam-2026-541045.html");
+testScrape("https://baohaiphong.vn/chu-tich-cac-pho-chu-tich-hdnd-thanh-pho-hai-phong-khoa-xvii-541026.html");

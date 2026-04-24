@@ -1,7 +1,7 @@
 const axios = require('axios');
 const cheerio = require('cheerio');
 
-axios.get('https://baohaiphong.vn/hai-phong-bo-sung-69-cong-trinh-du-an-thu-hoi-dat-nam-2026-541045.html').then(res => {
+axios.get('https://baohaiphong.vn/chu-tich-cac-pho-chu-tich-hdnd-thanh-pho-hai-phong-khoa-xvii-541026.html').then(res => {
     const $ = cheerio.load(res.data);
     console.log("Title:", $('h1').text());
     

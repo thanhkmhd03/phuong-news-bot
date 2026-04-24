@@ -88,6 +88,15 @@ async function scrapeImages(url, sourceName = 'Không rõ') {
 
         // Mở trang web
         await page.goto(url, { waitUntil: 'domcontentloaded', timeout: 30000 });
+
+        // Bắt buộc chờ Google News JS Redirect hoàn tất
+        try {
+            await page.waitForFunction(() => !window.location.hostname.includes('google.com'), { timeout: 15000 });
+            await page.waitForTimeout(2000); // Đợi trang đích nạp HTML
+        } catch (e) {
+            console.log(">> Cảnh báo: Chờ chuyển hướng quá lâu.");
+        }
+        
         console.log(">> URL hiện tại sau chuyển hướng: ", page.url());
 
         // [VÁ LỖI 3] - ÉP BOT CUỘN CHUỘT ĐỂ HIỆN ẢNH LAZY-LOAD
