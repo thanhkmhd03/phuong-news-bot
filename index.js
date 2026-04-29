@@ -92,7 +92,11 @@ async function scrapeImages(url, sourceName = 'Không rõ') {
         // Bắt buộc chờ Google News JS Redirect hoàn tất
         try {
             await page.waitForFunction(() => !window.location.hostname.includes('google.com'), { timeout: 15000 });
-            await page.waitForLoadState('domcontentloaded', { timeout: 30000 }); // Đợi trang đích thực sự nạp xong DOM
+            
+            // Đợi một trong các wrapper phổ biến xuất hiện để đảm bảo trang đích đã nạp xong HTML
+            const mainSelectors = '.b-maincontent, .detail-content, .fck_detail, .chi-tiet, .post-content, .article-body, .entry-content, article';
+            await page.waitForSelector(mainSelectors, { state: 'attached', timeout: 30000 });
+            
             await page.waitForTimeout(2000); // Đợi thêm cho ảnh lazy-load khởi tạo
         } catch (e) {
             console.log(">> Cảnh báo: Chờ chuyển hướng hoặc nạp trang đích quá lâu.");
